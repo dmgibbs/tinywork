@@ -1,3 +1,5 @@
+<%- include ./partials/_header %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +8,9 @@
 <body>
   <!-- Add your EJS code here -->
   <ul>
-  <%=  JSON.stringify(urls) %>
+  <% for (var item in urls ) {%>
+    <li>Short Url: <%= item %>   Long Url : <%= urls[item] %> </li>
+  <% } %>
   </ul>
 </body>
 </html>

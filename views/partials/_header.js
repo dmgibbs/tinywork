@@ -1,5 +1,5 @@
-<% include urls_index %>
-<% include urls_show %>
+<%- include urls_index %>
+<%- include urls_show %>
 
 <html>
 
