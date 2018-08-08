@@ -55,7 +55,7 @@ app.get("/u/:shortUrl", (req, res) => {
   console.log(req.params);
   let longUrl = urlDatabase[req.params.shortUrl];
   if (longUrl === undefined)  {
-    res.send("Unable to find key supplied")    ;
+    res.send("Unable to find key supplied") ;
   }
   else  {  res.redirect(longUrl);}
 
@@ -80,11 +80,28 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls");
 });
 
+// Update the short Url
+app.post("/urls/:id/edit", (req, res) => {
+  console.log("edit called");
+  let shortUrl = req.params.id;
+
+  console.log("short url: "+ req.params.id);
+  //delete urlDatabase[shortUrl];
+  console.log("deleted item. Redirecting..")
+  res.redirect("/urls");
+});
+
+
+
 
 app.post("/urls/:id/delete", (req, res) => {
-
+  console.log("delete called");
   let shortUrl = req.params.id;
+
+  console.log("short url: "+ req.params.id);
   delete urlDatabase[shortUrl];
+  console.log("deleted item. Redirecting..")
+  res.redirect("/urls");
 });
 
 
@@ -93,5 +110,3 @@ app.post("/urls/:id/delete", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-

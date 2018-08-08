@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,12 +9,18 @@
   <!-- Add your EJS code here -->
   <h2>Your Short URLs </h2>
   <ul>
+    <div>
   <% for (var item in urls ) {%>
     <li>Short Url: <%= item %>   Long Url : <%= urls[item] %>
-     <!-- <a href="url/:<%=item %>/edit">Edit</a>  <a href= "url/:<%=item %>/delete">Delete  --></a>
+      <form action = "/urls/:<%= item %>/edit" method = "POST">
+        <input type="submit" value = "Edit" name="Edit"/>
+      </form>
+      <form action = "/urls/<%= item %>/delete" method = "POST">
+        <input type="submit" value = "Delete" name="delete"/>
+      </form>
     </li>
   <% } %>
-
+  </div>
   </ul>
 </body>
 </html>
