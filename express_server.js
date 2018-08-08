@@ -17,8 +17,6 @@ function generateRandomString()
   return final;
 }
 
-
-
 var urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com',
@@ -48,8 +46,9 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortUrl: req.params.id,
                        longUrl : urlDatabase[req.params.id] };
-  res.render("urls_show", templateVars);
+  res.render("urls_edit", templateVars);
 });
+
 
 app.get("/u/:shortUrl", (req, res) => {
   console.log(req.params);
@@ -80,19 +79,16 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls");
 });
 
-// Update the short Url
-app.post("/urls/:id/edit", (req, res) => {
-  console.log("edit called");
-  let shortUrl = req.params.id;
 
-  console.log("short url: "+ req.params.id);
-  //delete urlDatabase[shortUrl];
-  console.log("deleted item. Redirecting..")
-  res.redirect("/urls");
+app.post("/urls/:id", (req, res) => {
+  console.log("edit called with : "+ req.params.id);
+  var longUrl = req.body.longUrl;
+
+  urlDatabase[req.params.id] = longUrl;
+  console.log("current longurl: " +urlDatabase[req.params.id]);
+  res.redirect("/urls/");
+
 });
-
-
-
 
 app.post("/urls/:id/delete", (req, res) => {
   console.log("delete called");
