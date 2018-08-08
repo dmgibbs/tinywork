@@ -1,13 +1,23 @@
-<%- include ./partials/_header %>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <title>Url Show</title>
+  <%- include ./partials/_header %>
 </head>
 <body>
+    <div>
     <!-- Add your EJS code here -->
-    <p>Short Url: <%= shortUrl %> Long Url : <%= longUrl %>  <a href="url/edit">Edit</a>
-      <a href= "Delete">Delete </a> </p>
+    <p>Short Url: <%= shortUrl %> Long Url : <%= longUrl %>
+      <a href="url/edit">Edit</a>
+
+    <form action="/urls" method="POST" style="margin:150px;">
+      <label for="longURL">Enter a URL:</label>
+      <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+      <input type="submit" value="Submit">
+    </form>
+    </p>
+    </div
+
+
 </body>
 </html>
