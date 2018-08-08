@@ -1,16 +1,21 @@
-<%- include ./partials/_header %>
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>TinyApp</title>
-</head>
+  <title>TinyUrl</title>
+  <%- include ./partials/_header %>
+  </head>
 <body>
   <!-- Add your EJS code here -->
+  <h2>Your Short URLs </h2>
   <ul>
   <% for (var item in urls ) {%>
-    <li>Short Url: <%= item %>   Long Url : <%= urls[item] %> </li>
+    <li>Short Url: <%= item %>   Long Url : <%= urls[item] %>
+     <!-- <a href="url/:<%=item %>/edit">Edit</a>  <a href= "url/:<%=item %>/delete">Delete  --></a>
+    </li>
   <% } %>
+
   </ul>
 </body>
 </html>

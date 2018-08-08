@@ -12,7 +12,7 @@ function generateRandomString()
   var tmpStr ="";
 
   tmpStr = Math.random().toString(36).replace('0.','');
-  final = tmpStr.slice(0,5);
+  final = tmpStr.slice(0,6);
   console.log(final);
   return final;
 }
@@ -20,9 +20,11 @@ function generateRandomString()
 
 
 var urlDatabase = {
-  b2xVn2: 'http://www.lighthouselabs.ca',
+  'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com',
-  'damion':'http://www.yahoo.com'
+  'd62m3k':'http://www.yahoo.com',
+  'g4YbR9':'http://www.altavista.com'
+
 };
 
 app.get("/", (req, res) => {
@@ -46,16 +48,19 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortUrl: req.params.id,
                        longUrl : urlDatabase[req.params.id] };
-
   res.render("urls_show", templateVars);
 });
 
-
-app.get("/Testthis",(req,res) => {
-  let newVars = { greeting: "Hello i'm testing this !!"};
-  res.render("hello_world",newVars );
+app.get("/u/:shortUrl", (req, res) => {
+  console.log(req.params);
+  let longUrl = urlDatabase[req.params.shortUrl];
+  if (longUrl === undefined)  {
+    res.send("Unable to find key supplied")    ;
+  }
+  else  {  res.redirect(longUrl);}
 
 });
+
 
 
 app.get("/hello", (req, res) => {
@@ -65,14 +70,24 @@ app.get("/hello", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  console.log(req.body.longURL); // show the long URL.
+  //console.log(req.body);  // debug statement to see POST parameters
+  //console.log(req.body.longURL); // show the long URL.
   let longUrl = req.body.longURL;
-  let shortUrl = "someShortString";
+  let shortUrl = generateRandomString();
+  console.log(shortUrl);
   urlDatabase[shortUrl]= longUrl;
   //res.send("Ok");         // Respond with 'Ok' (we will replace this)
-  res.redirect("urls");
+  res.redirect("/urls");
 });
+
+
+app.post("/urls/:id/delete", (req, res) => {
+
+  let shortUrl = req.params.id;
+  delete urlDatabase[shortUrl];
+});
+
+
 
 
 app.listen(PORT, () => {
