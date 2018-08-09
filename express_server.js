@@ -30,7 +30,7 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk"
-  }
+  },
  "user3RandomID": {
     id: "user3RandomID",
     email: "anext1@example.com",
@@ -62,10 +62,11 @@ function foundInDB(DB,key){
   var myKeys  = Object.keys(DB);  // get a list of keys of the Obj
   var sameKey = myKeys.indexOf(key) ;
 
-  if (sameKey === -1){
+  if (sameKey !== -1){   // -1 means not in list.
     console.log("i found same key");
     found = true;
   }
+  return found;
 }
 
 
@@ -78,6 +79,10 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  //let userObj = {username: req.cookies.username};
+  // show the user object.
+
+  console.log(req.params.username);
   let templateVars = { username:req.cookies.username , urls: urlDatabase};
   res.render("urls_index", templateVars);      // Use template file urls_index.ejs located in views folder
 });
@@ -163,13 +168,15 @@ app.post("/register", (req, res) => {
     res.status(401).send("Cannot find email or password.");
     bad_data = true;
   }
-  if (foundinDB(userEmail)){
+  if (foundInDB(userEmail)){
       res.status(401).send("Email already exists in Db.");
+      console.log('attempt to save on existing email. ')
       bad_data = true;
   }
   if (!bad_data) {
   // dump all contents to the users object
     users[uid]= {id: uid, email: userEmail, password: userPass}
+    console.log('DIdnt find the email in list')
     console.log(users);
     res.redirect("/urls");
   }
