@@ -31,11 +31,17 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk"
   }
+ "user3RandomID": {
+    id: "user3RandomID",
+    email: "anext1@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user4RandomID": {
+    id: "user4RandomID",
+    email: "thisguy@example.com",
+    password: "deeswasher-slums"
+  }
 }
-
-
-
-
 
 var urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
@@ -43,6 +49,25 @@ var urlDatabase = {
   'd62m3k':'http://www.yahoo.com',
   'g4YbR9':'http://www.altavista.com'
 };
+
+
+function isEmpty(str){
+  return (str==="") || (str=== undefined);
+}
+
+function foundInDB(DB,key){
+// searches for an item in an list of objects.
+//returns true if key is found; false otherwise.
+  var found   = false;
+  var myKeys  = Object.keys(DB);  // get a list of keys of the Obj
+  var sameKey = myKeys.indexOf(key) ;
+
+  if (sameKey === -1){
+    console.log("i found same key");
+    found = true;
+  }
+}
+
 
 app.get("/", (req, res) => {
   res.end("Hello!");
@@ -54,8 +79,6 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let templateVars = { username:req.cookies.username , urls: urlDatabase};
-  console.log(req.cookies.user);
-  console.log(urlDatabase);
   res.render("urls_index", templateVars);      // Use template file urls_index.ejs located in views folder
 });
 
@@ -74,9 +97,7 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_edit", templateVars);
 });
 
-
 app.get("/u/:shortUrl", (req, res) => {
-  console.log(req.params);
   let longUrl = urlDatabase[req.params.shortUrl];
   if (longUrl === undefined)  {
     res.send("Unable to find key supplied") ;
@@ -95,17 +116,13 @@ app.get("/login", (req, res) => {
 app.get("/register", (req, res) => {
   console.log("hit register routine");
   res.render("register");
-
 });
-
-
 
 app.post("/login", (req, res) => {
   console.log("login  post called");
   console.log(req.body.name);
   res.cookie('username',req.body.name);
   res.redirect("/urls");
-
 });
 
 
@@ -119,20 +136,17 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls");
 });
 
-
 app.post("/urls/:id", (req, res) => {
-  console.log("edit called with : "+ req.params.id);
+  //console.log("edit called with : "+ req.params.id);
   var longUrl = req.body.longUrl;
 
   urlDatabase[req.params.id] = longUrl;
-  console.log("current longurl: " +urlDatabase[req.params.id]);
+  //console.log("current longurl: " +urlDatabase[req.params.id]);
   res.redirect("/urls");
 
 });
 
 app.post("/logout", (req, res) => {
-  console.log("Logout  called : ") ;
-  // clear the cookie  & redirect back to urls page
   res.cookie("express.sid", "", { expires: new Date() });
   res.clearCookie('username');
   res.redirect("/urls");
@@ -140,15 +154,25 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  console.log("Posting the name : "+req.body.name)  ;
-  console.log("got email:   "  +req.body.email);
+  var bad_data = false;
   var uid = generateRandomString();  // get a random Id
-
   res.cookie('username',uid); // store this in cookie
+  userEmail = req.body.email;
+  userPass = req.body.password;
+  if (isEmpty(userEmail) || isEmpty(userPass)){
+    res.status(401).send("Cannot find email or password.");
+    bad_data = true;
+  }
+  if (foundinDB(userEmail)){
+      res.status(401).send("Email already exists in Db.");
+      bad_data = true;
+  }
+  if (!bad_data) {
   // dump all contents to the users object
-  users[uid]= {id: uid, email: req.body.email, password: req.body.password}
-  console.log(users);
-  res.redirect("/urls");
+    users[uid]= {id: uid, email: userEmail, password: userPass}
+    console.log(users);
+    res.redirect("/urls");
+  }
 });
 
 
