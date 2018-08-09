@@ -17,9 +17,25 @@ function generateRandomString()
 
   tmpStr = Math.random().toString(36).replace('0.','');
   final = tmpStr.slice(0,6);
-  console.log(final);
   return final;
 }
+
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
+
+
+
+
 
 var urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
@@ -76,6 +92,14 @@ app.get("/hello", (req, res) => {
 app.get("/login", (req, res) => {
 });
 
+app.get("/register", (req, res) => {
+  console.log("hit register routine");
+  res.render("register");
+
+});
+
+
+
 app.post("/login", (req, res) => {
   console.log("login  post called");
   console.log(req.body.name);
@@ -83,6 +107,8 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 
 });
+
+
 
 app.post("/urls", (req, res) => {
 
@@ -113,6 +139,17 @@ app.post("/logout", (req, res) => {
 
 });
 
+app.post("/register", (req, res) => {
+  console.log("Posting the name : "+req.body.name)  ;
+  console.log("got email:   "  +req.body.email);
+  var uid = generateRandomString();  // get a random Id
+
+  res.cookie('username',uid); // store this in cookie
+  // dump all contents to the users object
+  users[uid]= {id: uid, email: req.body.email, password: req.body.password}
+  console.log(users);
+  res.redirect("/urls");
+});
 
 
 app.post("/urls/:id/delete", (req, res) => {
