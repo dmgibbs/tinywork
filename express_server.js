@@ -44,11 +44,21 @@ const users = {
 }
 
 var urlDatabase = {
-  'b2xVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com',
-  'd62m3k':'http://www.yahoo.com',
-  'g4YbR9':'http://www.altavista.com'
+  "user3RandomID" : {'b2xVn2': 'http://www.lighthouselabs.ca'} ,
+   "user4RandomID" : {'9sm5xK': 'http://www.google.com'} ,
+   "user2RandomID"  :{'d62m3k': 'http://www.yahoo.com'},
+   "user4RandomID" : { 'g4YbR9': 'http://www.altavista.com'}
 };
+
+function getUrls(user){
+// Filters out specific urls  for a specific user. Returns empty if user has no entries
+// associated with that ID.
+
+  var myUrls ={};
+
+
+}
+
 
 
 function isEmpty(str){
@@ -77,6 +87,21 @@ function foundPass(DB,passwd){
   }
   return found;
 }
+function filterUrls(theDB, userId){
+// Parse the url List and return all short and long urls for that user
+  var mylist = {};
+
+  var keys = Object.keys();
+
+  for (var i=0;i < keys.length; i++)  {
+    let theId = theDB[keys[i]].uid;
+    if (theId === userId)
+      mylist[keys[i]] = theDB[keys[i]].url;
+  }
+  return mylist;
+}
+
+
 
 
 function getUserObj(id){
@@ -116,9 +141,13 @@ app.get("/urls/new", (req, res) => {
 
   var  userid = req.cookies.user_id;
   let templateVars = {user:userid, urls:urlDatabase};
-  // if user's cookie is not set then redirect to  /urls
-  res.render("urls_new",templateVars);
-  });
+  // if user's cookie is not set then redirect to  /login
+  if (!userid) {
+    console.log("redirect to login since no cookie found");
+    res.render("/login");
+  }
+  else { res.render("urls_new",templateVars);}
+});
 
 // this captures everything else
 app.get("/urls/:id", (req, res) => {
