@@ -21,8 +21,8 @@ function generateRandomString()
 }
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
+  "b2xVn2": {
+    id: "b2xVn2",
     email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
@@ -55,20 +55,39 @@ function isEmpty(str){
   return (str==="") || (str=== undefined);
 }
 
-function foundInDB(DB,key){
+function foundEmail(DB,themail){
 // searches for an item in an list of objects.
 //returns true if key is found; false otherwise.
-  var found   = false;
-  var myKeys  = Object.keys(DB);  // get a list of keys of the Obj
-  var sameKey = myKeys.indexOf(key) ;
-
-  if (sameKey !== -1){   // -1 means not in list.
-    console.log("i found same key");
-    found = true;
+  var found = false;
+  for (var key in DB){
+    if (DB[key].email === themail){
+      found = true;
+    }
+  }
+  return found;
+}
+function foundPass(DB,passwd){
+// searches for an item in an list of objects.
+//returns true if key is found; false otherwise.
+  var found = false;
+  for (var key in DB){
+    if (DB[key].password === passwd){
+      found = true;
+    }
   }
   return found;
 }
 
+
+function getUserObj(id){
+// using the cookie information, return an object storing the user information
+//return an empty object or return an object with info found from user table
+  var user  = {};
+  tmp = Object.values(id); // return an array of data with that key.
+  if(!tmp) return [];
+  else
+    return tmp;
+}
 
 app.get("/", (req, res) => {
   res.end("Hello!");
@@ -79,26 +98,34 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  //let userObj = {username: req.cookies.username};
-  // show the user object.
+    console.log("cookie obj: "+req.cookies.user_id);
+    if (req.cookies && req.cookies.user_id) {
+      console.log(" cookies made."+ req.cookies.user_id);
 
-  console.log(req.params.username);
-  let templateVars = { username:req.cookies.username , urls: urlDatabase};
-  res.render("urls_index", templateVars);      // Use template file urls_index.ejs located in views folder
+      var  userid = req.cookies.user_id;
+      let templateVars = {user: userid, urls:urlDatabase};
+      console.log("sending templatevars ="+templateVars);
+      res.render("urls_index", templateVars);      // Use template file urls_index.ejs located in views folder
+    }
+    else{
+      res.redirect("/login");
+    }
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { username:req.cookies.username,
-                       url: urlDatabase
-                     };
+
+  var  userid = req.cookies.user_id;
+  let templateVars = {user:userid, urls:urlDatabase};
+  // if user's cookie is not set then redirect to  /urls
   res.render("urls_new",templateVars);
-});
+  });
 
 // this captures everything else
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { username:req.cookies.username,
-                       shortUrl: req.params.id,
-                       longUrl : urlDatabase[req.params.id] };
+  var  userid = req.cookies.user_id;
+
+  let templateVars = { user:req.cookies.user_id,shortUrl: req.params.id,longUrl : urlDatabase[req.params.id] };
+
   res.render("urls_edit", templateVars);
 });
 
@@ -107,7 +134,7 @@ app.get("/u/:shortUrl", (req, res) => {
   if (longUrl === undefined)  {
     res.send("Unable to find key supplied") ;
   }
-  else  {  res.redirect(longUrl);}
+  else  {  res.redirect(longUrl);}  // is this correct ???
 
 });
 
@@ -116,24 +143,44 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+  console.log('Login called !!');
+  // if cookie exists then send them to /urls
+  // else if no cookie -- then redirect them to registration page.
+  //if (req.cookies.user_id)
+  //  res.redirect("/urls");
+  //else
+    res.render("login");
 });
 
 app.get("/register", (req, res) => {
-  console.log("hit register routine");
-  res.render("register");
+   res.render("register");
 });
 
 app.post("/login", (req, res) => {
-  console.log("login  post called");
-  console.log(req.body.name);
-  res.cookie('username',req.body.name);
-  res.redirect("/urls");
+  //console.log("login  post called: cookie:"+req.cookies.user_id );
+  var uid  = generateRandomString();
+  res.cookie('user_id',uid);
+  var userEmail = req.body.email;
+  var userPass = req.body.password;
+  console.log("List of Users:"+ users);
+  if (foundEmail(users,userEmail) && foundPass(users,userPass)) {
+    res.redirect("/urls");
+    console.log(" pass + email found");
+    return;
+  }
+  else if ( foundEmail(users,userEmail) && !foundPass(users,userPass)){
+    console.log(" email found, pass bad");
+    res.redirect("/login");
+    return;
+  }
+  else
+  {
+    res.redirect("/register");
+    return;
+  }
 });
 
-
-
 app.post("/urls", (req, res) => {
-
   let longUrl = req.body.longURL;
   let shortUrl = generateRandomString();
   console.log(shortUrl);
@@ -144,7 +191,6 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   //console.log("edit called with : "+ req.params.id);
   var longUrl = req.body.longUrl;
-
   urlDatabase[req.params.id] = longUrl;
   //console.log("current longurl: " +urlDatabase[req.params.id]);
   res.redirect("/urls");
@@ -153,33 +199,41 @@ app.post("/urls/:id", (req, res) => {
 
 app.post("/logout", (req, res) => {
   res.cookie("express.sid", "", { expires: new Date() });
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 
 });
 
 app.post("/register", (req, res) => {
-  var bad_data = false;
-  var uid = generateRandomString();  // get a random Id
-  res.cookie('username',uid); // store this in cookie
-  userEmail = req.body.email;
-  userPass = req.body.password;
+  var userEmail = req.body.email;
+  var userPass = req.body.password;
+  var username = req.body.name;
+  var user = req.body;
+
   if (isEmpty(userEmail) || isEmpty(userPass)){
-    res.status(401).send("Cannot find email or password.");
-    bad_data = true;
+
+    res.status(401);
+    res.redirect("/register");
+    console.log(" registering but email or pass empty");
+    return;
   }
-  if (foundInDB(userEmail)){
-      res.status(401).send("Email already exists in Db.");
-      console.log('attempt to save on existing email. ')
-      bad_data = true;
+  if (foundEmail(users,userEmail) ){
+      res.status(400);
+      console.log("attempting register on existing email")
+      res.redirect("/login");
+      return;
   }
-  if (!bad_data) {
-  // dump all contents to the users object
+    // got this far; all ok - dump all contents to the users object
+    console.log("didnt find email or password.. creating user..");
+    var uid = generateRandomString();  // get a random Id
+    res.cookie('user_id',uid); // store this in cookie
+    //res.cookie('username',uid);
+    console.log("creating cooking :");
+    console.log(res.cookie);
     users[uid]= {id: uid, email: userEmail, password: userPass}
-    console.log('DIdnt find the email in list')
+    console.log("added new user . See new list:.. directing to login");
     console.log(users);
-    res.redirect("/urls");
-  }
+    res.redirect("/login");
 });
 
 

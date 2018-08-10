@@ -1,26 +1,18 @@
 <!-- / This endpoint returns a page with a form and an email field. -->
-
-<!Doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
-
-    <title>  </title>
+    <h2><title>User Registration</title> </h2>
   </head>
-  <body>
+<h2>Tiny App 0.0.1<br><br>User Registration Form.</h2>
+ <body>
     <form action = "/register" method = "POST">
       <p>
-        <label for = "Username">  </label>
-        <input type = "text" name="name" placeholder = "username" ></input>
-        <input type = "email" name="email" placeholder = "email" ></input>
-        <input type = "password" name="password" placeholder = "password" ></input>
-
-       <input type=  "submit" value= "Submit">  </input>
-    </p>
-  </form>
+        Email: <input type = "email" name="email" placeholder = "email" ></input>
+        Password: <input type = "password" name="password" placeholder = "password" ></input>
+        <input type=  "submit" value= "Submit">  </input>
+      </p>
+    </form>
   </body>
 </html>
-
-
-
